@@ -3,8 +3,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://avatars.githubusercontent.com/u/31629704?s=200&v=4">
-    <img src="logo.svg" alt="Logo" width="80" height="80">
+  <a href="https://www.semasoftware.com/">
+    <img src="logo.svg" alt="Logo" width="100" height="100">
   </a>
 
   <h3 align="center">Developer Rubric Discord Bot</h3>
@@ -45,7 +45,7 @@ _How to run the discord bot locally._
 
 2. Clone the repo
    ```sh
-   git clone https://github.com/Semalab/developer-rubric-discord-bot.git
+   git clone https://github.com/YOUR_USERNAME_HERE/developer-rubric-discord-bot.git
    ```
 3. Install NPM packages
    ```sh
@@ -69,7 +69,7 @@ Contributions are what make the open source community such an amazing place to l
 If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
 Don't forget to give the project a star! Thanks again!
 
-1. Fork the Project
+1. Fork the project [here](https://github.com/Semalab/developer-rubric-discord-bot/fork)
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
