@@ -1,86 +1,113 @@
-<div id="top"></div>
+# Firebase Auth w/ Google Sign-In in Chrome Extensions
 
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://www.semasoftware.com/">
-    <img src="logo.svg" alt="Logo" width="100" height="100">
-  </a>
+This sample demonstrates how to authorize a user with Firebase in a Chrome extension using Google Sign-In and setup the Chrome extension to allow the use of the Realtime Database and Firebase Storage.
 
-  <h3 align="center">Developer Rubric Discord Bot</h3>
+## Introduction
 
-  <p align="center">
-    <a href="">View Demo</a>
-    ·
-    <a href="https://github.com/Semalab/developer-rubric-discord-bot/issues/new?assignees=nhcarrigan&labels=%F0%9F%9A%A6+status%3A+awaiting+triage&template=bug_report.yml&title=%5BBUG%5D+-+">Report Bug</a>
-    ·
-    <a href="https://github.com/Semalab/developer-rubric-discord-bot/issues/new?assignees=nhcarrigan&labels=%F0%9F%9A%A6+status%3A+awaiting+triage&template=feature_request.yml&title=%5BFEAT%5D+-+">Request Feature</a>
-  </p>
-</div>
+- [Read more about Firebase Auth](https://firebase.google.com/docs/auth/)
 
-## About The Project
+## Setting up this sample
 
-<!-- [![Developer Rubric Discord Bot][product-screenshot]](https://example.com) -->
+### Creating a dummy Chrome extension
 
-This is a Discord bot which allows you to assess your skills with our [developer rubric](https://github.com/Semalab/developer-rubric) directly on Discord.
+Setting up authentication in Chrome extensions via firebase require **Auth client ID** that can be obtain by Creating an OAuth Client.
 
-Here's what developer rubric is:
+### Creating an OAuth Client
 
-- A self-assessment tool you can use to measure your current place in your development journey.
-- It provide The markdown rubric, The JSON rubric, and The CSV rubric
+- Create a new **OAuth Client ID** in [your project's Developers Console](https://console.developers.google.com/apis/credentials/oauthclient?project=_) (Click this link and select your Firebase project).
+- Select **Chrome App** and enter your Chrome Extension/App ID (the `Item ID` obtained above).
+- Note the `Client ID` (e.g. `7159....j00.apps.googleusercontent.com`) as you will need this below.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+Now Create a new directory and add a `manifest.json` file similar to the following:
 
-### Installation
+    {
+      "manifest_version": 3,
+      "name": "Firebase Auth in Chrome Extension Sample",
+      "description": "This sample shows how to authorize Firebase in a Chrome extension using a Google account.",
+      "version": "0.1",
+      "permissions": [
+        "identity"
+      ],
+      "oauth2": {
+        "client_id": "---Auth client ID---",
+        "scopes": [
+            "https://www.googleapis.com/auth/userinfo.email",
+            "https://www.googleapis.com/auth/userinfo.profile"
+        ]
+    }
 
-_How to run the discord bot locally._
+Upload the dummy extension to the app store by going to the [Chrome App Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard) and clicking **Add a New Item**. For more reading on publishing to the Chrome Web Store, go [here](https://developer.chrome.com/webstore/publish).
 
-1. Setting up discord bot:
+> Of course if you already own an extension and would like to add Firebase to it, add the oauth2 section.
 
-- Login to the Discord Developer portal and create a new Application.
-- Add a bot to the Application after selecting "Bot" from the left-side panel.
-- Copy the bot's token.
-- Go to the Oauth2 tab > URL Generator and select both bot and applications.commandss scopes, along with the - Administrator permission. Copy the URL generated and invite the bot in your server.
-- Copy the guild id of the server you invited the bot into
+### Configuring your Firebase Project
 
-2. Clone the repo
-   ```sh
-   git clone https://github.com/YOUR_USERNAME_HERE/developer-rubric-discord-bot.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm i
-   ```
-4. Enter your BOT_TOKEN and GUILD_ID in `.env`
-   ```js
-   BOT_TOKEN = "";
-   GUILD_ID = "";
-   ```
-5. Run this command to start the bot locally
-   ```sh
-   npm run start:dev
-   ```
-   <p align="right">(<a href="#top">back to top</a>)</p>
+- Create or select a Firebase project at [Firebase Console](https://console.firebase.google.com).
+- Enable the **Google** authentication method in the **Auth** section > **SIGN IN METHOD** tab.
+- Add the Client ID you created to the whitelist using the **Whitelist client IDs from external projects (optional)**
+- Edit the `credential.js` and `background.js` and enter your project's identifiers you get from the Firebase Console **Overview > Add Firebase to your web app**.
+- Edit the `manifest.json`
+  - Enter your **OAuth Client ID**.
+  - Remove all comment lines (starting with `//`) in the `manifest.json` file before deploying your extension online.
+- Install the Extension in your browser and click on the extension's icon once installed. The first time your users will install the extension they will have to authorize Firebase using the login button.
 
-## Contributing
+## Using Firebase in your own extension
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+The keys to using Firebase in a Chrome extension are:
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
+- Because of Chrome Extensions' [Content Security Policy](https://developer.chrome.com/extensions/contentSecurityPolicy) you need to avoid inline JavaScript in your HTML pages so you need to add some sort of module bundler to avoid that.
 
-1. Fork the project [here](https://github.com/Semalab/developer-rubric-discord-bot/fork)
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+  - As Chrome MV3 no longer allowed remote hosted code. Using module bundlers we can add the required code for your extension. Any modular script should be added as entry point.
 
-<p align="right">(<a href="#top">back to top</a>)</p>
+- Because of module bundler now you can use [typically instruct](https://firebase.google.com/docs/web/setup) to setup the firebase.
 
-<!-- LICENSE -->
+```javascript
+// Initialize Firebase
+import { initializeApp } from "firebase/app";
+
+// TODO: Replace the following with your app's Firebase project configuration
+const firebaseConfig = {
+  //...
+};
+
+const app = initializeApp(firebaseConfig);
+```
+
+- Create a Google Client ID that's authorized for your Chrome extension and whitelist it in your Firebase project:
+  - Create a new OAuth Client ID in your project's [Developers Console](https://console.developers.google.com/apis/credentials/oauthclient?project=_), Select **Chrome App** and enter your Chrome Extension/App ID.
+  - In your project's Firebase Console, enable the **Google** authentication method in the **Auth** section > **SIGN IN METHOD** tab.
+  - Add the Client ID you created to the whitelist using the **Whitelist client IDs from external projects (optional)**
+- Use the chrome.identity API to get a Google OAuth token as described in https://developer.chrome.com/apps/app_identity and then use this token to authorize Firebase using [Auth.signInWithCredential()](https://firebase.google.com/docs/reference/js/firebase.auth.Auth#signInWithCredential):
+
+```javascript
+const auth = getAuth(app);
+
+const credential = GoogleAuthProvider.credential(null, token);
+
+await signInWithCredential(auth, credential)
+  .then((result) => {
+    console.log(result);
+
+    console.log("User name is : " + result.user.displayName);
+  })
+  .catch((error) => {
+    // You can handle errors here
+    console.log(error);
+  });
+```
+
+### Now this section is not require
+
+As Manifest V3 disallows certain CSP modifications for `extension_pages` that were permitted in Manifest V2. [Content security policy](https://developer.chrome.com/docs/extensions/mv3/intro/mv3-migration/#content-security-policy) for Manifest V3.
+
+    ```javascript
+    "content_security_policy":"script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com; object-src 'self'"
+    ```
+
+## Support
+
+https://firebase.google.com/support/
 
 ## License
 
-Distributed under the GNU Affero General Public License v3.0. See `LICENSE.md` for more information.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+© Google, 2016. Licensed under an [Apache-2](../../LICENSE) license.
